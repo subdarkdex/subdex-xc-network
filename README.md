@@ -1,19 +1,20 @@
-# Subdex cross chain network Deprecated - only docker supported
+# Subdex cross chain network 
 
 This repo provides simple scripts, inspired by polkadot/cumulus, to set up a network with:-
 1. Relay Chain with 4 validators (Alice, Bob, Charlie and Dave)
-2. Generic parachain (test parachain in cumulus)
-3. Subdex parachain (parachain with generic-asset and dex pallet)
+2. Generic parachain (parachain with generic-assets-token-dealer, assets and balances pallets)
+3. Subdex parachain (parachain with dex-xcmp and dex-pallet)
 
 The relay chain chain-specs is a modified version of westend_local, with `validator_count = 4` to support 2 parachains.
 
+This is a part of the submission for Subdex grant awarded by the Web3Foundation
+1. [subdex-ui](https://github.com/subdarkdex/subdex-ui) (React frontend providing friendly UI)
+1. **subdex-xc-network** (current repo)
+1. TODO - individual pallets 
+1. Helper Repo - [subdex-parachain](https://github.com/subdarkdex/subdex-parachain) (Parachains using the Cumulus framework with the dex-xcmp and dex-pallet)
+1. Helper Repo - [generic-parachain](https://github.com/subdarkdex/generic-parachain) (Parachains using the Cumulus framework with the generic-assets-token-dealer and assets pallet)
 
-This is a part of the submission for Hackusama 2020. 
-1. [subdex-chain](https://github.com/subdarkdex/subdex-chain) (Standalone dex-pallet in a substrate node)
-2. [subdex-ui](https://github.com/subdarkdex/subdex-ui) (React frontend providing friendly UI)
-3. **subdex-xc-network** (current repo)
-4. [subdex-parachains](https://github.com/subdarkdex/subdex-parachains) (Parachains using the Cumulus framework with the substrate-parachain-template, generic-parachain and dex_chain branches)
-
+// TODO block begins 
 #### To run with docker
 ```sh
 # in the root of this directory
@@ -56,6 +57,8 @@ cd docker
 # or other versions
 ```
 
+// TODO block ends 
+
 ## Run local parachain binarys
 ### Pre-requisits
 - Docker version 19.03.8, build afacb8b
@@ -77,8 +80,9 @@ Steps required are:-
 
 ### 2. build parachains
 ```
-./build_collators.sh
+./build_collators_from_local.sh
 ```
+This will set up 2 repositories parallel to this one if they are not already setup, one is generic-parachain and the other the subdex-chain
 
 ### 3. run the parachains
 ```
@@ -93,7 +97,10 @@ Steps required are:-
 ### 5. stop validators
 `docker-compose -f docker-compose-validatorsOnly.yml down`
 
-### 6. (purge-chains, all chains)
+### 6. stop collators
+`killall parachain-collator`
+
+### 7. (purge-chains, all chains)
 ```
 ./clear_all.sh
 ```
