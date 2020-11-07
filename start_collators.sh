@@ -8,8 +8,8 @@
 
 set -e
 
-gc="../generic-parachain/target/debug/parachain-collator"
-sc="../subdex-parachain/target/debug/parachain-collator"
+gc="../generic-parachain/target/release/parachain-collator"
+sc="../subdex-parachain/target/release/parachain-collator"
 
 if [ ! -x "$gc" -o  ! -x "$sc" ]; then
     echo "FATAL: no correct executables"
@@ -93,4 +93,5 @@ sc_args+=("--base-path=subdex_parachain_data"
     )
 
 set -x
-"$gc" "${gc_args[@]}" & "$sc" "${sc_args[@]}"
+# "$gc" "${gc_args[@]}" & "$sc" "${sc_args[@]}"
+"$sc" "${sc_args[@]}" 
