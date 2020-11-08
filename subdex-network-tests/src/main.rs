@@ -1,15 +1,14 @@
-use codec::{Compact,Encode};
+use codec::{Compact, Encode};
 use sp_core::crypto;
-use frame_system as System;
 use sp_keyring::AccountKeyring;
 use substrate_subxt::{
-    balances,
-    Call, ClientBuilder, EventsDecoder, KusamaRuntime, NodeTemplateRuntime, PairSigner,
+    balances, system, Call, ClientBuilder, EventsDecoder, KusamaRuntime, NodeTemplateRuntime,
+    PairSigner,
 };
 
 const GENERIC_CHAIN_WS: &str = "127.0.0.1:7744";
-const SUBDEX_CHAIN_WS: &str = "127.0.0.1:9944";
-const RELAY_ALICE_WS: &str = "127.0.0.1:6644";
+// const SUBDEX_CHAIN_WS: &str = "127.0.0.1:9944";
+// const RELAY_ALICE_WS: &str = "127.0.0.1:6644";
 
 #[async_std::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -25,24 +24,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Begin to submit extrinsics
     let transfer_to_relay = client
         .watch(
-            TransferCall<NodeTemplateRuntime>{
+            TransferCall::<NodeTemplateRuntime> {
+                dest: to,
+                amount: 100u128,
+                asset_id: vec![0],
             },
             &signer,
         )
         .await?;
-    println!("\nResult for ipfs_add_bytes: {:?}", transfer_to_relay);
+    println!("\nResult for : {:?}", transfer_to_relay);
 
     Ok(())
 }
 
 #[derive(Encode)]
-pub struct TransferCall<P: Public> {
-    dest: P,
-    amount: u128,  
+pub struct TransferCall<T: system::System + balances::Balances> {
+    dest: T::AccountId,
+    amount: T::Balance,
     asset_id: Vec<u8>,
 }
 
-impl Call<NodeTemplateRuntime> for TransferCall::<P> {
+impl Call<NodeTemplateRuntime> for TransferCall<NodeTemplateRuntime> {
     const MODULE: &'static str = "TokenDealer";
     const FUNCTION: &'static str = "transfer_tokens_to_relay_chain";
     fn events_decoder(_decoder: &mut EventsDecoder<NodeTemplateRuntime>) {}
