@@ -10,7 +10,7 @@ services:
       - ./:/data
     command:
       - --chain=/data/dex_raw.json
-      - --base-path=/data/validator_alice_data
+      - --base-path=/data/tmp/validator_alice_data
       - --port=30333
       - --ws-port=6644
       - --rpc-port=9933
@@ -33,7 +33,7 @@ services:
 
     command:
       - --chain=/data/dex_raw.json
-      - --base-path=/data/validator_bob_data
+      - --base-path=/data/tmp/validator_bob_data
       - --port=30335
       - --ws-port=9922
       - --rpc-port=9911
@@ -56,7 +56,7 @@ services:
 
     command:
       - --chain=/data/dex_raw.json
-      - --base-path=/data/validator_charlie_data
+      - --base-path=/data/tmp/validator_charlie_data
       - --port=30336
       - --ws-port=8822
       - --rpc-port=8811
@@ -79,7 +79,7 @@ services:
 
     command:
       - --chain=/data/dex_raw.json
-      - --base-path=/data/validator_dave_data
+      - --base-path=/data/tmp/validator_dave_data
       - --port=30337
       - --ws-port=8844
       - --rpc-port=8833
