@@ -14,50 +14,8 @@ This is a part of the submission for Subdex grant awarded by the Web3Foundation
 1. Helper Repo - [subdex-parachain](https://github.com/subdarkdex/subdex-parachain) (Parachains using the Cumulus framework with the dex-xcmp and dex-pallet)
 1. Helper Repo - [generic-parachain](https://github.com/subdarkdex/generic-parachain) (Parachains using the Cumulus framework with the generic-assets-token-dealer and assets pallet)
 
-// TODO block begins 
-#### To run with docker
-```sh
-# in the root of this directory
-docker-compose --file docker-compose-xc.yml up
-```
-
-#### To stop
-```sh
-# in the root of this directory
-docker-compose --file docker-compose-xc.yml down -v
-./clear_all.sh 
-```
-
 ___
 ## Development
-
-### building all docker images for dockerhub
-
-1. **Base images** - this is to compile the binary / wasm file from branches of subdex_cumulus
-
-```sh
-# To build
-
-# for generic-parachain
-git clone https://github.com/subdarkdex/subdex_parachains.git dex-parachain
-cd dex-parachain
-docker build --tag subdarkdex/generic-chain:<version>
-
-```
-
-2. **Collators, WASM Runtime Volume, Registrar**
-- collators - both dex and generic parachains
-- wasm runtime volume - this is a copy of the wasm runtime for the collators, used to register parachain, we also have the genesis state volume built during docker-compose up for this purpose
-- registrar - simple polkadotjs cli container to register the parachains using sudo
-
-
-```sh
-cd docker
-./build-containers.sh v0.1.0 
-# or other versions
-```
-
-// TODO block ends 
 
 ## Run local parachain binarys
 ### Pre-requisits
@@ -84,14 +42,16 @@ Steps required are:-
 ```
 This will set up 2 repositories parallel to this one if they are not already setup, one is generic-parachain and the other the subdex-chain
 
-### 3. run the parachains
-```
-./start_collators.sh
-```
-
-### 4. register parachains
+### 3. register parachains
 ```
 ./register_parachain.sh
+```
+
+### 4. run the parachains
+```sh
+# Run whichever you need
+./start_generic_chain.sh
+./start_subdex_chain.sh
 ```
 
 ### 5. stop validators
@@ -105,21 +65,62 @@ This will set up 2 repositories parallel to this one if they are not already set
 ./clear_all.sh
 ```
 
+___
+### TODO building all docker images for dockerhub
 
-## Setup config details
-#### Parachain account
+1. **Base images** - this is to compile the binary / wasm file from branches of subdex_cumulus
+
+```sh
+# To build
+
+# for generic-parachain
+git clone https://github.com/subdarkdex/subdex_parachains.git dex-parachain
+cd dex-parachain
+docker build --tag subdarkdex/generic-chain:<version>
+
+```
+
+2. **Collators, WASM Runtime Volume, Registrar**
+- collators - both dex and generic parachains
+- wasm runtime volume - this is a copy of the wasm runtime for the collators, used to register parachain, we also have the genesis state volume built during docker-compose up for this purpose
+- registrar - simple polkadotjs cli container to register the parachains using sudo
+
+
+```sh
+cd docker
+./build-containers.sh v0.1.0 
+# or other versions
+```
+
+#### To run with docker
+```sh
+# in the root of this directory
+docker-compose --file docker-compose-xc.yml up
+```
+
+#### To stop
+```sh
+# in the root of this directory
+docker-compose --file docker-compose-xc.yml down -v
+./clear_all.sh 
+```
+
+### Config
+#### Accounts
 
 The parachain account is tied to the `parachain_id` [encoded](https://github.com/paritytech/polkadot/blob/master/parachain/src/primitives.rs#L164)
 
+The relay account is tied to the binary representation of `relay` [here](https://github.com/subdarkdex/generic-parachain/blob/master/pallets/token-dealer/src/lib.rs#L54)
 ```
  Parachain id: Id(100) Generic Parachain
  Parachain Account: 5Ec4AhP7HwJNrY2CxEcFSy1BuqAY3qxvCQCfoois983TTxDA
 ... 
  Parachain id: Id(200) Dex Parachain
  Parachain Account: 5Ec4AhPTL6nWnUnw58QzjJvFd3QATwHA3UJnvSD4GVSQ7Gop
+
+
+ Relay Account on Parachain: 5Dvjuthoa1stHkMDTH8Ljr9XaFiVLYe4f9LkAQLDjL3KqHoX
 ```
-
-
 #### Chain specs
 The DarkDex chain spec is a duplication of the westend-local chain, but with 4 validators and validator count as 4. Changes were made to v0.8.14 - chain_spec.rs
 
