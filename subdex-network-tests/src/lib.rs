@@ -1,15 +1,28 @@
+use codec::{Codec, Compact, Decode, Encode};
+use frame_support::Parameter;
+use sp_core::crypto;
+use sp_core::crypto::Ss58Codec;
+use sp_keyring::AccountKeyring;
+use sp_runtime::traits::{AtLeast32Bit, MaybeSerialize, Member};
+use std::fmt::Debug;
+use std::time::Duration;
+use substrate_subxt::{
+    balances,
+    balances::{BalancesEventsDecoder, TransferCallExt, TransferEvent},
+    module, system,
+    system::{AccountStoreExt, SystemEventsDecoder},
+    Call, Client, ClientBuilder, DefaultNodeRuntime, Event, EventSubscription, EventsDecoder,
+    KusamaRuntime, NodeTemplateRuntime, PairSigner, Runtime,
+};
+
+mod assets;
+mod parachains;
+mod token_dealer;
+
 #[cfg(test)]
 mod test {
-    use codec::{Compact, Encode};
-    use sp_core::crypto;
-    use sp_core::crypto::Ss58Codec;
-    use sp_keyring::AccountKeyring;
-    use std::time::Duration;
-    use substrate_subxt::{
-        balances, system, system::AccountStoreExt, Call, Client, ClientBuilder, DefaultNodeRuntime,
-        EventsDecoder, KusamaRuntime, NodeTemplateRuntime, PairSigner, Runtime,
-    };
-    use tokio::time::sleep;
+    use super::*;
+    // use tokio::time::sleep;
 
     const GENERIC_CHAIN_WS: &str = "ws://127.0.0.1:7744";
     const SUBDEX_CHAIN_WS: &str = "ws://127.0.0.1:9944";
@@ -17,6 +30,12 @@ mod test {
     const GENERIC_ACCOUNT: &str = "5Ec4AhP7HwJNrY2CxEcFSy1BuqAY3qxvCQCfoois983TTxDA";
     const SUBDEX_ACCOUNT: &str = "5Ec4AhPTL6nWnUnw58QzjJvFd3QATwHA3UJnvSD4GVSQ7Gop";
     const RELAY_ACCOUNT: &str = "5Dvjuthoa1stHkMDTH8Ljr9XaFiVLYe4f9LkAQLDjL3KqHoX";
+
+    impl parachains::Parachains for KusamaRuntime {}
+    impl token_dealer::TokenDealer for NodeTemplateRuntime {}
+    impl assets::Assets for NodeTemplateRuntime {
+        type AssetId = u64;
+    }
 
     #[tokio::test]
     async fn transfer_tokens_to_relay_chain() {
@@ -55,19 +74,19 @@ mod test {
 
         let r = generic_client
             .watch(
-                IssueCall::<NodeTemplateRuntime> {
-                    total: Compact(initial_amount),
+                assets::IssueCall::<NodeTemplateRuntime> {
+                    total: initial_amount,
                 },
                 &from,
             )
             .await;
-        println! {"Issue Call Extrinsic {:?}", r};
+        assert! {r.is_ok()};
 
-        // cannot use assert, need to figure out how to add type assetId here
+        // cannot use assert, need to figure out how to add type Option<AssetId> here
         // but it actually does get into the block
         let para_transfer_to_relay = generic_client
             .watch(
-                TransferToRelayCall::<NodeTemplateRuntime> {
+                token_dealer::TransferTokensToRelayChainCall::<NodeTemplateRuntime> {
                     dest: to.clone(),
                     amount: transfer_amount,
                     asset_id: Some(0),
@@ -78,6 +97,23 @@ mod test {
         println! {"Transfer Call Extrinsic {:?}", para_transfer_to_relay};
 
         //ideally we want to know relay_chain has emitted an event before checking
+        let sub = relay_client.subscribe_events().await.unwrap();
+        let mut decoder = EventsDecoder::<KusamaRuntime>::new(relay_client.metadata().clone());
+        decoder.with_balances();
+        let mut sub = EventSubscription::<KusamaRuntime>::new(sub, decoder);
+        sub.filter_event::<TransferEvent<_>>();
+        loop {
+            let raw = sub.next().await.unwrap().unwrap();
+            let event = TransferEvent::<KusamaRuntime>::decode(&mut &raw.data[..]);
+            if let Ok(e) = event {
+                println!("Balance transfer success: value: {:?}", e.amount);
+                if e.amount == transfer_amount {
+                    break;
+                }
+            } else {
+                println!("Failed to subscribe to Balances::Transfer Event");
+            }
+        }
         let to_post = relay_client.account(&to, None).await.unwrap();
         println! {"post-account balance {:?}", to_post};
 
@@ -105,6 +141,13 @@ mod test {
     //         .await
     //         .unwrap();
 
+    //     let sub = generic_client.subscribe_events().await.unwrap();
+    //     let mut decoder =
+    //         EventsDecoder::<NodeTemplateRuntime>::new(generic_client.metadata().clone());
+    //     decoder.with_balances();
+    //     let mut sub = EventSubscription::<NodeTemplateRuntime>::new(sub, decoder);
+    //     sub.filter_event::<TransferEvent<_>>();
+
     //     let generic_transfer = generic_client
     //         .watch(
     //             balances::TransferCall {
@@ -114,17 +157,15 @@ mod test {
     //             &para_admin,
     //         )
     //         .await;
-    //     println!(
-    //         "generic transfer to relay account on generic {:?}",
-    //         generic_transfer
-    //     );
+    //     assert! {generic_transfer.is_ok()};
+    //     println!("Preset: Transfer some balance to relay_chain account on generic OK!",);
 
     //     let to_pre = generic_client.account(&to, None).await.unwrap();
-    //     println! {"pre-account balance {:?}", to_pre};
+    //     println! {"pre-account free balance {:?}", to_pre.data.free};
 
     //     let relay_parachain_transfer = relay_client
     //         .watch(
-    //             TransferToParaCall::<KusamaRuntime> {
+    //             parachains::TransferToParachainCall::<KusamaRuntime> {
     //                 to: 100,
     //                 amount: transfer_amount,
     //                 remark: asset_id,
@@ -132,49 +173,33 @@ mod test {
     //             &from,
     //         )
     //         .await;
-    //     println! {"Transfer Call Extrinsic {:?}", relay_parachain_transfer};
-    //     sleep(Duration::from_millis(6000)).await;
+    //     assert! {relay_parachain_transfer.is_ok()};
+
+    //     loop {
+    //         match sub.next().await {
+    //             Some(next_event) => match next_event {
+    //                 Ok(raw) => {
+    //                     // Only transfer events filtered through
+    //                     let e = TransferEvent::<NodeTemplateRuntime>::decode(&mut &raw.data[..])
+    //                         .unwrap();
+    //                     println!("Balance transfer success: value: {:?}", e.amount);
+    //                     if e.amount == transfer_amount {
+    //                         break;
+    //                     }
+    //                 }
+    //                 Err(e) => {
+    //                     // This happens to the TransferredTokensFromRelayChain event
+    //                     println!("Extrinsic err");
+    //                     println!("{:?}", e);
+    //                     break;
+    //                 }
+    //             },
+    //             None => break,
+    //         }
+    //     }
 
     //     let to_post = generic_client.account(&to, None).await.unwrap();
-    //     println! {"post-account balance {:?}", to_post};
-
+    //     println! {"post-account free balance {:?}", to_post.data.free};
     //     assert_eq!(to_pre.data.free + transfer_amount, to_post.data.free);
     // }
-    #[derive(Encode)]
-    pub struct IssueCall<T: system::System + balances::Balances> {
-        total: Compact<T::Balance>,
-    }
-
-    impl Call<NodeTemplateRuntime> for IssueCall<NodeTemplateRuntime> {
-        const MODULE: &'static str = "Assets";
-        const FUNCTION: &'static str = "issue";
-        fn events_decoder(_decoder: &mut EventsDecoder<NodeTemplateRuntime>) {}
-    }
-
-    #[derive(Encode)]
-    pub struct TransferToRelayCall<T: system::System + balances::Balances> {
-        dest: T::AccountId,
-        amount: T::Balance,
-        asset_id: Option<u64>,
-    }
-
-    impl Call<NodeTemplateRuntime> for TransferToRelayCall<NodeTemplateRuntime> {
-        const MODULE: &'static str = "TokenDealer";
-        const FUNCTION: &'static str = "transfer_tokens_to_relay_chain";
-        fn events_decoder(_decoder: &mut EventsDecoder<NodeTemplateRuntime>) {}
-    }
-
-    #[derive(Encode)]
-    pub struct TransferToParaCall<T: system::System + balances::Balances> {
-        /// ParaId
-        to: u32,
-        amount: T::Balance,
-        remark: [u8; 32],
-    }
-
-    impl Call<KusamaRuntime> for TransferToParaCall<KusamaRuntime> {
-        const MODULE: &'static str = "Parachains";
-        const FUNCTION: &'static str = "transfer_to_parachain";
-        fn events_decoder(_decoder: &mut EventsDecoder<KusamaRuntime>) {}
-    }
 }

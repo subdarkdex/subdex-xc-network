@@ -11,4 +11,7 @@ sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "rococo
 codec = { package = "parity-scale-codec", version = "1.3.5", default-features = false, features = ["derive"] }
 tokio = { version = "0.3", features = ["full"] }
 sp-core = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch", features = ["full_crypto"]}
+frame-support = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch", package = "frame-support" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch", package = "sp-runtime" }
+
 

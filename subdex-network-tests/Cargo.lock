@@ -3145,9 +3145,11 @@ dependencies = [
 name = "subdex-network-tests"
 version = "0.1.0"
 dependencies = [
+ "frame-support",
  "parity-scale-codec",
  "sp-core",
  "sp-keyring",
+ "sp-runtime",
  "substrate-subxt",
  "tokio 0.3.3",
 ]
