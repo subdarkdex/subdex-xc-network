@@ -59,7 +59,7 @@ mod test {
             .unwrap();
 
         let relay_transfer = relay_client
-            .submit(
+            .watch(
                 balances::TransferCall {
                     to: &generic_para_account,
                     amount: 2 * transfer_amount,
@@ -67,7 +67,8 @@ mod test {
                 &relay_admin,
             )
             .await;
-        println!("relay transfer to para account {:?}", relay_transfer);
+        assert!(relay_transfer.is_ok());
+        println!("Preset: relay transfer to para account on relay chain OK",);
 
         let to_pre = relay_client.account(&to, None).await.unwrap();
         println! {"pre-account balance {:?}", to_pre};
@@ -81,6 +82,7 @@ mod test {
             )
             .await;
         assert! {r.is_ok()};
+        println!("Preset: Issue some token is OK",);
 
         // cannot use assert, need to figure out how to add type Option<AssetId> here
         // but it actually does get into the block
@@ -96,7 +98,6 @@ mod test {
             .await;
         println! {"Transfer Call Extrinsic {:?}", para_transfer_to_relay};
 
-        //ideally we want to know relay_chain has emitted an event before checking
         let sub = relay_client.subscribe_events().await.unwrap();
         let mut decoder = EventsDecoder::<KusamaRuntime>::new(relay_client.metadata().clone());
         decoder.with_balances();
@@ -191,7 +192,6 @@ mod test {
     //                     // This happens to the TransferredTokensFromRelayChain event
     //                     println!("Extrinsic err");
     //                     println!("{:?}", e);
-    //                     break;
     //                 }
     //             },
     //             None => break,
