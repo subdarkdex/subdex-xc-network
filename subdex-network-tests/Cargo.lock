@@ -3150,6 +3150,7 @@ dependencies = [
  "sp-core",
  "sp-keyring",
  "sp-runtime",
+ "sp-std",
  "substrate-subxt",
  "tokio 0.3.3",
 ]
@@ -3184,7 +3185,6 @@ dependencies = [
 [[package]]
 name = "substrate-subxt"
 version = "0.11.0"
-source = "git+https://github.com/subdarkdex/substrate-subxt?branch=subdex_test#efabd94da31f4dc396ab932e8efa0d9086db36a4"
 dependencies = [
  "frame-metadata",
  "frame-support",
@@ -3211,7 +3211,6 @@ dependencies = [
 [[package]]
 name = "substrate-subxt-proc-macro"
 version = "0.11.0"
-source = "git+https://github.com/subdarkdex/substrate-subxt?branch=subdex_test#efabd94da31f4dc396ab932e8efa0d9086db36a4"
 dependencies = [
  "heck",
  "proc-macro-crate",

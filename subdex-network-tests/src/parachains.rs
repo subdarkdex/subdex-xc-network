@@ -1,12 +1,8 @@
-use codec::{Codec, Compact, Decode, Encode};
-use frame_support::Parameter;
-use substrate_subxt::{
-    balances, balances::BalancesEventsDecoder, module, system, system::SystemEventsDecoder, Call,
-    Event, EventsDecoder,
-};
+use codec::Encode;
+use substrate_subxt::{balances::*, module, system::*, Call};
 
 #[module]
-pub trait Parachains: system::System + balances::Balances {}
+pub trait Parachains: System + Balances {}
 
 #[derive(Clone, Debug, Eq, PartialEq, Call, Encode)]
 pub struct TransferToParachainCall<T: Parachains> {

@@ -6,12 +6,14 @@ edition = "2018"
 
 
 [dependencies]
-substrate-subxt = { git = "https://github.com/subdarkdex/substrate-subxt", branch = "subdex_test" } 
+#substrate-subxt = { git = "https://github.com/subdarkdex/substrate-subxt", branch = "subdex_test" } 
+substrate-subxt = { path = "../../../substrate-subxt-forked" } 
 sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
 codec = { package = "parity-scale-codec", version = "1.3.5", default-features = false, features = ["derive"] }
 tokio = { version = "0.3", features = ["full"] }
 sp-core = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch", features = ["full_crypto"]}
 frame-support = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch", package = "frame-support" }
 sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch", package = "sp-runtime" }
+sp-std = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch", package = "sp-std" }
 
 
