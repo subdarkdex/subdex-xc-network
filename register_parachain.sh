@@ -20,3 +20,4 @@ node ./docker/register \
     ../../../subdex-parachain/target/release/wbuild/parachain-runtime/parachain_runtime.compact.wasm \
     ../../tmp/sc_gs \
     200
+
