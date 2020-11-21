@@ -15,6 +15,5 @@ sp-core = { git = "https://github.com/paritytech/substrate", branch = "rococo-br
 frame-support = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch", package = "frame-support" }
 sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch", package = "sp-runtime" }
 sp-std = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch", package = "sp-std" }
-# cumulus_primitives = { git = "https://github.com/paritytech/cumulus", rev = "4d150a01993265d62ab05032db6f24db7503e6ee", package = "cumulus-primitives" }
 
 
