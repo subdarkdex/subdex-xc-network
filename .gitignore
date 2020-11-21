@@ -3,3 +3,5 @@
 **/node_modules
 *_gs
 .DS_Store
+**/target/
+tmp
