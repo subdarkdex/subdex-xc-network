@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 
 # this script runs the generic-parachain-collator after fetching
 # appropriate bootnode IDs

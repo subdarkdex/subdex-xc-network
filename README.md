@@ -29,8 +29,8 @@ ___
 Steps required are:-
 1. set up relay chain validators
 1. set up default cumulus parachain 
-1. run paraA and paraB
 1. register parachains
+1. run paraA and paraB
 
 
 ### 1. Set up validators
@@ -53,14 +53,17 @@ This will set up 2 repositories parallel to this one if they are not already set
 ./start_generic_chain.sh
 ./start_subdex_chain.sh
 ```
-
-### 5. stop validators
+### 5. run network tests
+```
+./run_network_tests.sh
+```
+### 6. stop validators
 `docker-compose -f docker-compose-validatorsOnly.yml down`
 
-### 6. stop collators
+### 7. stop collators
 `killall parachain-collator`
 
-### 7. (purge-chains, all chains)
+### 8. (purge-chains, all chains)
 ```
 ./clear_all.sh
 ```
