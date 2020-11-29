@@ -8,7 +8,7 @@
 
 set -e
 
-dc="/usr/bin/subdex-parachain-collator"
+dc="/usr/local/bin/parachain-collator"
 
 if [ ! -x "$dc" ]; then
     echo "FATAL: no correct executables"
@@ -41,8 +41,7 @@ bootnode () {
 }
 
 
-
-dc_args+=("--base-path=/data/dex_data" 
+dc_args+=("--base-path=/subdex/tmp/dex_data" 
     "--parachain-id=200" 
     "--validator"
     "--port=30333"
@@ -53,7 +52,7 @@ dc_args+=("--base-path=/data/dex_data"
     "--rpc-cors=all" 
     "--out-peers=0" 
     "--in-peers=0" 
-    "--" "--chain=/data/dex_raw.json" 
+    "--" "--chain=/chainspec/rococo-4.json" 
     "--bootnodes=$(bootnode "$alice_ip")" 
     "--bootnodes=$(bootnode "$bob_ip")" 
     "--ws-port=6622" 

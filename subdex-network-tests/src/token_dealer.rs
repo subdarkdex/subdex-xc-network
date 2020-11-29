@@ -23,7 +23,6 @@ pub struct TransferTokensToRelayChainCall<T: TokenDealer> {
 pub struct TransferAssetsToParachainChainCall<T: TokenDealer> {
     pub para_id: T::ParaId,
     pub dest: T::AccountId,
-    pub des_asset_id: Option<T::AssetIdOf>,
     pub amount: T::Balance,
     pub asset_id: Option<T::AssetIdOf>,
 }

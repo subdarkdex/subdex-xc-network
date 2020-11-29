@@ -5,15 +5,74 @@ This repo provides simple scripts, inspired by polkadot/cumulus, to set up a net
 2. Generic parachain (parachain with generic-assets-token-dealer, assets and balances pallets)
 3. Subdex parachain (parachain with dex-xcmp and dex-pallet)
 
-The relay chain chain-specs is a modified version of westend_local, with `validator_count = 4` to support 2 parachains.
+The relay chain chain-specs is `rococo-4.json` from cumulus-workshop
 
-This is a part of the submission for Subdex grant awarded by the Web3Foundation
+This is a part of the submission for Open Grant awarded by the Web3Foundation
 1. [subdex-ui](https://github.com/subdarkdex/subdex-ui) (React frontend providing friendly UI)
 1. **subdex-xc-network** (current repo)
-1. TODO - individual pallets 
+1. [pallet-subdex]()
+1. [pallet-generic-token-dealer](https://github.com/subdarkdex/pallet-generic-token-dealer)
 1. Helper Repo - [subdex-parachain](https://github.com/subdarkdex/subdex-parachain) (Parachains using the Cumulus framework with the dex-xcmp and dex-pallet)
 1. Helper Repo - [generic-parachain](https://github.com/subdarkdex/generic-parachain) (Parachains using the Cumulus framework with the generic-assets-token-dealer and assets pallet)
+____
 
+## Interaction
+The subdex testnet can be interacted with through 
+- Subdex Parachain (Dex is here!)
+- Relay Chain
+- Generic Parachain
+
+#### To Connnect to our Deployed Network 
+- Subdex Parachain - Please visit our dex UI [here]() to connect to the Subdex Parachain
+
+You can also interact with the Relay Chain and the Generic Parachain through the polkadot.js.org/apps 
+- Relay Chain - wss://subdex.link/relay
+- Generic Parachain - wss://subdex.link/generic
+
+
+#### local testnet (deployed with docker-compose-xc.yml) 
+- Subdex Parachain - localhost:9944
+- Relay Chain - localhost:6644
+- Generic Parachain - localhost:7744
+
+#### Types:
+If you are using the polkadot.js.org/apps web application, please make sure you add:
+
+```
+{
+  "AssetId": "u64",
+  "AssetIdOf": "AssetId",
+  "Address": "AccountId",
+  "LookupSource": "AccountId",
+  "RefCount": "u8",
+}
+```
+
+For subdex-parachain specific types, please see [here](https://github.com/subdarkdex/subdex-ui/blob/master/src/config/common.json#L5)
+
+#### Accounts
+
+The parachain account is tied to the `parachain_id` [encoded](https://github.com/paritytech/polkadot/blob/master/parachain/src/primitives.rs#L164)
+The relay account is tied to the binary representation of `relay` [here](https://github.com/subdarkdex/generic-parachain/blob/master/pallets/token-dealer/src/lib.rs#L54)
+```
+ Parachain id: Id(100) Generic Parachain
+ Parachain Account: 5Ec4AhP7HwJNrY2CxEcFSy1BuqAY3qxvCQCfoois983TTxDA
+... 
+ Parachain id: Id(200) Dex Parachain
+ Parachain Account: 5Ec4AhPTL6nWnUnw58QzjJvFd3QATwHA3UJnvSD4GVSQ7Gop
+
+ Relay Account on Parachain: 5Dvjuthoa1stHkMDTH8Ljr9XaFiVLYe4f9LkAQLDjL3KqHoX
+```
+
+## Run a local testnet 
+
+```sh
+# in the root of this directory
+docker-compose --file docker-compose-xc.yml up
+
+# To stop it and remove all data
+docker-compose --file docker-compose-xc.yml down -v
+```
 ___
 ## Development
 
@@ -30,7 +89,7 @@ Steps required are:-
 1. set up relay chain validators
 1. set up default cumulus parachain 
 1. register parachains
-1. run paraA and paraB
+1. run subdex and generic parachains
 
 
 ### 1. Set up validators
@@ -58,28 +117,25 @@ This will set up 2 repositories parallel to this one if they are not already set
 ./run_network_tests.sh
 ```
 ### 6. stop validators
-`docker-compose -f docker-compose-validatorsOnly.yml down`
+`docker-compose -f docker-compose-validatorsOnly.yml down -v`
 
-### 7. stop collators
-`killall parachain-collator`
-
-### 8. (purge-chains, all chains)
+### 7. (purge-chains, all chains, all genesis states)
 ```
 ./clear_all.sh
 ```
 
 ___
-### TODO building all docker images for dockerhub
+### Building all docker images for dockerhub
 
 1. **Base images** - this is to compile the binary / wasm file from branches of subdex_cumulus
 
 ```sh
 # To build
 
-# for generic-parachain
-git clone https://github.com/subdarkdex/subdex_parachains.git dex-parachain
+# same for generic-parachain
+git clone https://github.com/subdarkdex/subdex_parachain.git dex-parachain
 cd dex-parachain
-docker build --tag subdarkdex/generic-chain:<version>
+docker build --tag subdarkdex/subdex-chain:<version>
 
 ```
 
@@ -91,60 +147,6 @@ docker build --tag subdarkdex/generic-chain:<version>
 
 ```sh
 cd docker
-./build-containers.sh v0.1.0 
+./build-containers.sh v0.2.0 
 # or other versions
 ```
-
-#### To run with docker
-```sh
-# in the root of this directory
-docker-compose --file docker-compose-xc.yml up
-```
-
-#### To stop
-```sh
-# in the root of this directory
-docker-compose --file docker-compose-xc.yml down -v
-./clear_all.sh 
-```
-
-### Config
-#### Accounts
-
-The parachain account is tied to the `parachain_id` [encoded](https://github.com/paritytech/polkadot/blob/master/parachain/src/primitives.rs#L164)
-
-The relay account is tied to the binary representation of `relay` [here](https://github.com/subdarkdex/generic-parachain/blob/master/pallets/token-dealer/src/lib.rs#L54)
-```
- Parachain id: Id(100) Generic Parachain
- Parachain Account: 5Ec4AhP7HwJNrY2CxEcFSy1BuqAY3qxvCQCfoois983TTxDA
-... 
- Parachain id: Id(200) Dex Parachain
- Parachain Account: 5Ec4AhPTL6nWnUnw58QzjJvFd3QATwHA3UJnvSD4GVSQ7Gop
-
-
- Relay Account on Parachain: 5Dvjuthoa1stHkMDTH8Ljr9XaFiVLYe4f9LkAQLDjL3KqHoX
-```
-#### Chain specs
-The DarkDex chain spec is a duplication of the westend-local chain, but with 4 validators and validator count as 4. Changes were made to v0.8.14 - chain_spec.rs
-
-```sh
-# westend-local was updated with 4 validators, Alice, Bob, Charlie and Dave
-./target/release/polkadot build-spec --chain=westend-local --raw --disable-default-bootnode > dex_raw.json
-```
-
-___
-## Interaction
-
-This version works with 1.29 polkadot js on https://polkadot.js.org/apps/
-
-#### Types:
-```
-{
-  "AssetId": "u64",
-  "Address": "AccountId",
-  "LookupSource": "AccountId"
- 
-}
-```
-
-

@@ -1,16 +1,24 @@
 version: '3'
 services:
   validator-alice:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e5855c5
+    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
+    labels: 
+      - traefik.enable=true
+      - traefik.http.routers.validatorAlice.rule=Host(`subdex.link`) && Path(`/relay`) 
+      - traefik.http.routers.validatorAlice.tls=true
+      - traefik.http.routers.validatorAlice.tls.certresolver=letsEncrypt
+      - traefik.http.routers.validatorAlice.service=validatorAlice
+      - traefik.http.services.validatorAlice.loadbalancer.server.port=9944
     ports:
       - '30333:30333'
       - '6644:9944'
       - '9933:9933'
     volumes:
-      - ./:/data
+      - ./chainspec:/chainspec
+      - validator_alice:/data
     command:
-      - --chain=/data/dex_raw.json
-      - --base-path=/data/alice_data
+      - --chain=/chainspec/rococo-4.json
+      - --base-path=/data/tmp/alice_data
       - --port=30333
       - --ws-port=9944
       - --rpc-port=9933
@@ -28,16 +36,17 @@ services:
           - alice
 
   validator-bob:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e5855c5
+    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
     ports:
       - '30335:30333'
       - '9966:9944'
       - '9955:9933'
     volumes:
-      - ./:/data
+      - ./chainspec:/chainspec
+      - validator_bob:/data
     command:
-      - --chain=/data/dex_raw.json
-      - --base-path=/data/bob_data
+      - --chain=/chainspec/rococo-4.json
+      - --base-path=/data/tmp/bob_data
       - --port=30333
       - --ws-port=9944
       - --rpc-port=9933
@@ -55,16 +64,17 @@ services:
           - bob
   
   validator-charlie:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e5855c5
+    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
     ports:
       - '30337:30333'
       - '9988:9944'
       - '9977:9933'
     volumes:
-      - ./:/data
+      - ./chainspec:/chainspec
+      - validator_charlie:/data
     command:
-      - --chain=/data/dex_raw.json
-      - --base-path=/data/charlie_data
+      - --chain=/chainspec/rococo-4.json
+      - --base-path=/data/tmp/charlie_data
       - --port=30333
       - --ws-port=9944
       - --rpc-port=9933
@@ -82,16 +92,17 @@ services:
           - charlie
 
   validator-dave:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e5855c5
+    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
     ports:
       - '30339:30333'
       - '9922:9944'
       - '9911:9933'
     volumes:
-      - ./:/data
+      - ./chainspec:/chainspec
+      - validator_charlie:/data
     command:
-      - --chain=/data/dex_raw.json
-      - --base-path=/data/dave_data
+      - --chain=/chainspec/rococo-4.json
+      - --base-path=/data/tmp/dave_data
       - --port=30333
       - --ws-port=9944
       - --rpc-port=9933
@@ -109,38 +120,46 @@ services:
           - dave
 
   dex-genesis-state:
-    image: subdarkdex/subdex-collator:v0.1.0
+    image: subdarkdex/subdex-collator:v0.2.0
     volumes:
-      - subdex-genesis-state:/data
+       - subdex-genesis-state:/subdex
     command: >
-      /usr/bin/subdex-parachain-collator
-      export-genesis-state
-      /data/subdex-genesis-state
+      /usr/local/bin/parachain-collator
+      export-genesis-state --parachain-id=200 
+      /subdex/subdex-genesis-state
 
   generic-genesis-state:
-    image: subdarkdex/generic-collator:v0.1.0
+    image: subdarkdex/generic-collator:v0.2.0
     volumes:
-      - generic-genesis-state:/data
+      - generic-genesis-state:/generic
     command: >
-      /usr/bin/generic-parachain-collator
-      export-genesis-state
-      /data/generic-genesis-state
+      /usr/local/bin/parachain-collator
+      export-genesis-state --parachain-id=100
+      /generic/generic-genesis-state
     
   dex-collator:
-    image: subdarkdex/subdex-collator:v0.1.0
+    labels: 
+      - traefik.enable=true
+      - traefik.http.routers.dex.rule=Host(`subdex.link`)
+      - traefik.http.routers.dex.tls=true
+      - traefik.http.routers.dex.tls.certresolver=letsEncrypt
+      - traefik.http.routers.dex.service=dex
+      - traefik.http.services.dex.loadbalancer.server.port=9944
+    image: subdarkdex/subdex-collator:v0.2.0
     ports:
       - '40440:30333'
       - '9944:9944'
       - '6633:9933'
     volumes:
-      - ./:/data
+      - ./chainspec:/chainspec
+      - dex-collator:/data
     depends_on:
       - validator-alice
       - validator-bob
       - validator-charlie
       - validator-dave
     command: >
-      /usr/bin/start_dex_collator.sh
+      /usr/local/bin/start_dex_collator.sh
     networks:
       dex_net:
         ipv4_address: 172.28.1.8
@@ -148,20 +167,28 @@ services:
           - dex-collator
 
   generic-collator:
-    image: subdarkdex/generic-collator:v0.1.0
+    labels: 
+      - traefik.enable=true
+      - traefik.http.routers.generic.rule=Host(`subdex.link`) && Path(`/generic`)
+      - traefik.http.routers.generic.tls=true
+      - traefik.http.routers.generic.tls.certresolver=letsEncrypt
+      - traefik.http.routers.generic.service=generic
+      - traefik.http.services.generic.loadbalancer.server.port=9944
+    image: subdarkdex/generic-collator:v0.2.0
     ports:
       - '40444:30333'
       - '7744:9944'
       - '7733:9933'
     volumes:
-      - ./:/data
+      - ./chainspec:/chainspec
+      - generic-collator:/data
     depends_on:
       - validator-alice
       - validator-bob
       - validator-charlie
       - validator-dave
     command: >
-      /usr/bin/start_generic_collator.sh
+      /usr/local/bin/start_generic_collator.sh
     networks:
       dex_net:
         ipv4_address: 172.28.1.10
@@ -169,17 +196,17 @@ services:
           - generic-collator
 
   dex-runtime:
-    image: subdarkdex/subdex-runtime:v0.1.0
+    image: subdarkdex/subdex-runtime:v0.2.0
     volumes:
-      - subdex-chain-wasm-runtime:/runtime
+       - subdex-chain-wasm-runtime:/runtime
 
   generic-runtime:
-    image: subdarkdex/generic-runtime:v0.1.0
+    image: subdarkdex/generic-runtime:v0.2.0
     volumes:
       - generic-chain-wasm-runtime:/runtime
     
   registrar:
-    image: subdarkdex/subdex-registrar:v0.1.0
+    image: subdarkdex/subdex-registrar:v0.2.0
     volumes:
       - subdex-genesis-state:/subdex-genesis-state
       - generic-genesis-state:/generic-genesis-state
@@ -200,6 +227,12 @@ volumes:
   subdex-chain-wasm-runtime:
   generic-genesis-state:
   generic-chain-wasm-runtime:
+  dex-collator:
+  generic-collator:
+  validator_alice:
+  validator_bob:
+  validator_charlie:
+  validator_dave:
 
 networks:
   dex_net:
