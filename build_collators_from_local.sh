@@ -8,6 +8,8 @@ if [ ! -d "$DIRECTORY" ]; then
 fi
 
 cd ../generic-parachain
+git fetch --all
+git checkout tags/rc5 
 cargo build --release
 cd ../subdex-xc-network
 
@@ -17,5 +19,8 @@ if [ ! -d "$DIRECTORY" ]; then
     git clone https://github.com/subdarkdex/subdex-parachain.git ../subdex-parachain
 fi
 cd ../subdex-parachain
+git fetch --all
+# TODO update branch
+git checkout master
 cargo build --release
 cd ../subdex-xc-network

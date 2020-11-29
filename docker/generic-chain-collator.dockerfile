@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install jq curl bash -y && \
     chmod +x /wait-for-it.sh && \
     curl -sL https://deb.nodesource.com/setup_12.x | bash - 
 COPY --from=generic \
-    /generic_chain/target/release/generic-parachain-collator /usr/bin
+    /generic/target/release/generic-parachain-collator /usr/bin
 COPY ./start_generic_collator.sh /usr/bin
 
 

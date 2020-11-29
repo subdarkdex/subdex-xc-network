@@ -388,17 +388,22 @@ mod test {
             .unwrap();
 
         let bob_currency_pre = match dex_currency_id {
-            Some(currency_id) => dex_client
-                .fetch(
-                    dex_pallet::AssetBalancesStore {
-                        account_id: &bob_account,
-                        asset_id: currency_id,
-                    },
-                    None,
-                )
-                .await
-                .unwrap()
-                .unwrap(),
+            Some(currency_id) => {
+                match dex_client
+                    .fetch(
+                        dex_pallet::AssetBalancesStore {
+                            account_id: &bob_account,
+                            asset_id: currency_id,
+                        },
+                        None,
+                    )
+                    .await
+                    .unwrap()
+                {
+                    Some(pre) => pre,
+                    None => 0,
+                }
+            }
             None => 0,
         };
         println! {"Bob account free balance before transfers: {:?}", bob_currency_pre};

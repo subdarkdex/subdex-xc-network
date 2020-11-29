@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install jq curl bash -y && \
     chmod +x /wait-for-it.sh && \
     curl -sL https://deb.nodesource.com/setup_12.x | bash - 
 COPY --from=dex \
-    /subdex_chain/target/release/subdex-parachain-collator /usr/bin
+    /subdex_chain/target/release/parachain-collator /usr/bin
 COPY ./start_dex_collator.sh /usr/bin
 # This queries bootnodes and run collator, a binary copied
 
