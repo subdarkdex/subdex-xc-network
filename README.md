@@ -142,8 +142,8 @@ This version works with 1.29 polkadot js on https://polkadot.js.org/apps/
 {
   "AssetId": "u64",
   "Address": "AccountId",
-  "LookupSource": "AccountId"
- 
+  "LookupSource": "AccountId",
+  "RefCount": "u8",
 }
 ```
 

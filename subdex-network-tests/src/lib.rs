@@ -286,31 +286,6 @@ mod test {
         assert! {relay_transfer_currency.is_ok()};
         println! {"Transfer Currency from Relay is OK"};
 
-        // let sub = generic_client.subscribe_events().await.unwrap();
-        // let mut decoder =
-        //     EventsDecoder::<NodeTemplateRuntime>::new(generic_client.metadata().clone());
-        // decoder.with_balances();
-        // let mut sub = EventSubscription::<NodeTemplateRuntime>::new(sub, decoder);
-        // // TODO filter TransferredTokensFromRelayChainEvent also
-        // sub.filter_event::<TransferEvent<_>>();
-        // while let Some(next_event) = sub.next().await {
-        //     match next_event {
-        //         Ok(raw) => {
-        //             // Only transfer events filtered through
-        //             let e =
-        //                 TransferEvent::<NodeTemplateRuntime>::decode(&mut &raw.data[..]).unwrap();
-        //             println!("Currency Balance transfer success: value: {:?}", e.amount);
-        //             if e.amount == transfer_amount / 2 {
-        //                 break;
-        //             }
-        //         }
-        //         Err(e) => {
-        //             println!("Extrinsic err");
-        //             println!("{:?}", e);
-        //         }
-        //     }
-        // }
-
         println!("Ensure Extrinsic Included...");
         sleep(Duration::from_millis(15000)).await;
 
@@ -388,17 +363,22 @@ mod test {
             .unwrap();
 
         let bob_currency_pre = match dex_currency_id {
-            Some(currency_id) => dex_client
-                .fetch(
-                    dex_pallet::AssetBalancesStore {
-                        account_id: &bob_account,
-                        asset_id: currency_id,
-                    },
-                    None,
-                )
-                .await
-                .unwrap()
-                .unwrap(),
+            Some(currency_id) => {
+                match dex_client
+                    .fetch(
+                        dex_pallet::AssetBalancesStore {
+                            account_id: &bob_account,
+                            asset_id: currency_id,
+                        },
+                        None,
+                    )
+                    .await
+                    .unwrap()
+                {
+                    Some(pre) => pre,
+                    None => 0,
+                }
+            }
             None => 0,
         };
         println! {"Bob account free balance before transfers: {:?}", bob_currency_pre};
@@ -410,7 +390,6 @@ mod test {
                 token_dealer::TransferAssetsToParachainChainCall::<NodeTemplateRuntime> {
                     para_id: SUBDEX_PARA_ID,
                     dest: bob_account.clone(),
-                    des_asset_id: Some(issued_asset_id),
                     amount: transfer_amount,
                     asset_id: Some(issued_asset_id),
                 },
@@ -424,7 +403,6 @@ mod test {
                 token_dealer::TransferAssetsToParachainChainCall::<NodeTemplateRuntime> {
                     para_id: SUBDEX_PARA_ID,
                     dest: bob_account.clone(),
-                    des_asset_id: None,
                     amount: transfer_amount,
                     asset_id: None,
                 },
@@ -522,7 +500,7 @@ mod test {
                 &bob_pair,
             )
             .await;
-        println! {"Transfer Asset from Dex is OK {:?}", dex_transfer_asset};
+        println! {"Transfer Asset from Dex is OK if codec err {:?}", dex_transfer_asset};
 
         let dex_transfer_currency = dex_client
             .watch(
@@ -536,7 +514,7 @@ mod test {
             )
             .await;
 
-        println! {"Transfer Currency from Dex is OK {:?}", dex_transfer_currency};
+        println! {"Transfer Currency from Dex is {:?}", dex_transfer_currency};
 
         println!("Ensuring block after transfer event...");
         sleep(Duration::from_millis(15000)).await;

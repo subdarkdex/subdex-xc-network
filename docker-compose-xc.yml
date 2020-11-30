@@ -1,7 +1,7 @@
 version: '3'
 services:
   validator-alice:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e5855c5
+    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
     ports:
       - '30333:30333'
       - '6644:9944'
@@ -28,7 +28,7 @@ services:
           - alice
 
   validator-bob:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e5855c5
+    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
     ports:
       - '30335:30333'
       - '9966:9944'
@@ -55,7 +55,7 @@ services:
           - bob
   
   validator-charlie:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e5855c5
+    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
     ports:
       - '30337:30333'
       - '9988:9944'
@@ -82,7 +82,7 @@ services:
           - charlie
 
   validator-dave:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e5855c5
+    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
     ports:
       - '30339:30333'
       - '9922:9944'
@@ -109,38 +109,38 @@ services:
           - dave
 
   dex-genesis-state:
-    image: subdarkdex/subdex-collator:v0.1.0
+    image: subdarkdex/subdex-collator:v0.2.0
     volumes:
-      - subdex-genesis-state:/data
+      - subdex-genesis-state:/subdex
     command: >
-      /usr/bin/subdex-parachain-collator
+      /usr/local/bin/subdex-parachain-collator
       export-genesis-state
-      /data/subdex-genesis-state
+      /subdex/subdex-genesis-state
 
   generic-genesis-state:
-    image: subdarkdex/generic-collator:v0.1.0
+    image: subdarkdex/generic-collator:v0.2.0
     volumes:
-      - generic-genesis-state:/data
+      - generic-genesis-state:/generic
     command: >
-      /usr/bin/generic-parachain-collator
+      /usr/local/bin/generic-parachain-collator
       export-genesis-state
-      /data/generic-genesis-state
+      /generic/generic-genesis-state
     
   dex-collator:
-    image: subdarkdex/subdex-collator:v0.1.0
+    image: subdarkdex/subdex-collator:v0.2.0
     ports:
       - '40440:30333'
       - '9944:9944'
       - '6633:9933'
     volumes:
-      - ./:/data
+      - ./:/subdex
     depends_on:
       - validator-alice
       - validator-bob
       - validator-charlie
       - validator-dave
     command: >
-      /usr/bin/start_dex_collator.sh
+      /usr/local/bin/start_dex_collator.sh
     networks:
       dex_net:
         ipv4_address: 172.28.1.8
@@ -148,7 +148,7 @@ services:
           - dex-collator
 
   generic-collator:
-    image: subdarkdex/generic-collator:v0.1.0
+    image: subdarkdex/generic-collator:v0.2.0
     ports:
       - '40444:30333'
       - '7744:9944'
@@ -161,7 +161,7 @@ services:
       - validator-charlie
       - validator-dave
     command: >
-      /usr/bin/start_generic_collator.sh
+      /usr/local/bin/start_generic_collator.sh
     networks:
       dex_net:
         ipv4_address: 172.28.1.10
@@ -169,17 +169,17 @@ services:
           - generic-collator
 
   dex-runtime:
-    image: subdarkdex/subdex-runtime:v0.1.0
+    image: subdarkdex/subdex-runtime:v0.2.0
     volumes:
       - subdex-chain-wasm-runtime:/runtime
 
   generic-runtime:
-    image: subdarkdex/generic-runtime:v0.1.0
+    image: subdarkdex/generic-runtime:v0.2.0
     volumes:
       - generic-chain-wasm-runtime:/runtime
     
   registrar:
-    image: subdarkdex/subdex-registrar:v0.1.0
+    image: subdarkdex/subdex-registrar:v0.2.0
     volumes:
       - subdex-genesis-state:/subdex-genesis-state
       - generic-genesis-state:/generic-genesis-state

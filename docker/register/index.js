@@ -20,6 +20,7 @@ async function main () {
   const api = await ApiPromise.create({ 
     provider: wsProvider,
     types: { 
+	    "RefCount": "u8",
       "Address": "AccountId", 
       "LookupSource": "AccountId",
     }
