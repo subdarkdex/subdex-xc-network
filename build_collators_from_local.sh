@@ -21,6 +21,6 @@ fi
 cd ../subdex-parachain
 git fetch --all
 # TODO update branch
-git checkout master
+git checkout subdex
 cargo build --release
 cd ../subdex-xc-network
