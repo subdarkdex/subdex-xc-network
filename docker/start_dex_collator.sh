@@ -41,6 +41,7 @@ bootnode () {
 }
 
 
+
 dc_args+=("--base-path=/subdex/tmp/dex_data" 
     "--parachain-id=200" 
     "--validator"

@@ -11,6 +11,7 @@ services:
       - validator_alice:/data
     command:
       - --chain=/chainspec/rococo-4.json
+
       - --base-path=/data/tmp/validator_alice_data
       - --port=30333
       - --ws-port=6644
@@ -34,6 +35,7 @@ services:
       - validator_bob:/data
     command:
       - --chain=/chainspec/rococo-4.json
+
       - --base-path=/data/tmp/validator_bob_data
       - --port=30335
       - --ws-port=9922

@@ -1,9 +1,11 @@
 FROM subdarkdex/generic-chain:v0.2.0 as generic
 
 FROM debian:stretch-slim as collator
+
 LABEL link.subdex.image.authors="subdex" \
 	link.subdex.image.title="generic_chain" \
 	link.subdex.image.description="Generic parachain with assets to demo token dealer" 
+
 
 # install tools and dependencies
 RUN apt-get update && \
@@ -15,7 +17,9 @@ RUN apt-get update && \
 		curl && \
 		curl -sSo /wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
 		chmod +x /wait-for-it.sh && \
+
 		curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+
 # apt cleanup
 	apt-get autoremove -y && \
 	apt-get clean && \

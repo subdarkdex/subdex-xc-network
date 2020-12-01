@@ -9,6 +9,7 @@ services:
       - traefik.http.routers.validatorAlice.tls.certresolver=letsEncrypt
       - traefik.http.routers.validatorAlice.service=validatorAlice
       - traefik.http.services.validatorAlice.loadbalancer.server.port=9944
+
     ports:
       - '30333:30333'
       - '6644:9944'
@@ -126,6 +127,7 @@ services:
     command: >
       /usr/local/bin/parachain-collator
       export-genesis-state --parachain-id=200 
+
       /subdex/subdex-genesis-state
 
   generic-genesis-state:
@@ -145,6 +147,7 @@ services:
       - traefik.http.routers.dex.tls.certresolver=letsEncrypt
       - traefik.http.routers.dex.service=dex
       - traefik.http.services.dex.loadbalancer.server.port=9944
+
     image: subdarkdex/subdex-collator:v0.2.0
     ports:
       - '40440:30333'
