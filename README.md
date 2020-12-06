@@ -1,11 +1,11 @@
 # Subdex cross chain network 
 
 This repo provides simple scripts, inspired by polkadot/cumulus, to set up a network with:-
-1. Relay Chain with 4 validators (Alice, Bob, Charlie and Dave)
+1. Relay Chain with 3 validators (Alice, Bob, Charlie)
 2. Generic parachain (parachain with generic-assets-token-dealer, assets and balances pallets)
 3. Subdex parachain (parachain with dex-xcmp and dex-pallet)
 
-The relay chain chain-specs is `rococo-4.json` from cumulus-workshop
+The relay chain chain-specs is `rococo-3.json` from cumulus-workshop
 
 This is a part of the submission for Open Grant awarded by the Web3Foundation
 1. [subdex-ui](https://github.com/subdarkdex/subdex-ui) (React frontend providing friendly UI)
@@ -93,7 +93,7 @@ Steps required are:-
 
 
 ### 1. Set up validators
-`docker-compose -f docker-compose-validatorsOnly.yml up` will set up alice, bob, charlie and dave
+`docker-compose -f docker-compose-validatorsOnly.yml up` will set up alice, bob and charlie
 
 ### 2. build parachains
 ```
