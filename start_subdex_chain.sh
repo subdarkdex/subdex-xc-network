@@ -20,11 +20,9 @@ sc_args=( "$@" )
 alice_p2p="30333"
 bob_p2p="30335"
 charlie_p2p="30336"
-dave_p2p="30337"
 alice_rpc="9933"
 bob_rpc="9911"
 charlie_rpc="8811"
-dave_rpc="8833"
 
 
 get_id () {
@@ -60,9 +58,9 @@ sc_args+=("--base-path=tmp/subdex_parachain_data"
     "--out-peers=0" 
     "--in-peers=0" 
     "--" 
-    "--chain=rococo-4.json" 
+    "--chain=chainspec/rococo-3.json" 
     "--bootnodes=$(bootnode "$charlie_p2p" "$charlie_rpc")" 
-    "--bootnodes=$(bootnode "$dave_p2p" "$dave_rpc")" 
+    "--bootnodes=$(bootnode "$alice_p2p" "$alice_rpc")" 
     "--ws-port=6622" 
     "--rpc-port=6611" 
     "--port=40330"

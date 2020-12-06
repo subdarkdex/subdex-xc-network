@@ -21,11 +21,9 @@ gc_args=( "$@" )
 alice_p2p="30333"
 bob_p2p="30335"
 charlie_p2p="30336"
-dave_p2p="30337"
 alice_rpc="9933"
 bob_rpc="9911"
 charlie_rpc="8811"
-dave_rpc="8833"
 
 
 get_id () {
@@ -61,7 +59,7 @@ gc_args+=("--base-path=tmp/generic_parachain_data"
     "--out-peers=0" 
     "--in-peers=0"
     "--" 
-    "--chain=rococo-4.json" 
+    "--chain=chainspec/rococo-3.json" 
     "--bootnodes=$(bootnode "$alice_p2p" "$alice_rpc")" 
     "--bootnodes=$(bootnode "$bob_p2p" "$bob_rpc")" 
     "--ws-port=7722"

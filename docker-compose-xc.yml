@@ -17,7 +17,7 @@ services:
       - ./chainspec:/chainspec
       - validator_alice:/data
     command:
-      - --chain=/chainspec/rococo-4.json
+      - --chain=/chainspec/rococo-3.json
       - --base-path=/data/tmp/alice_data
       - --port=30333
       - --ws-port=9944
@@ -45,7 +45,7 @@ services:
       - ./chainspec:/chainspec
       - validator_bob:/data
     command:
-      - --chain=/chainspec/rococo-4.json
+      - --chain=/chainspec/rococo-3.json
       - --base-path=/data/tmp/bob_data
       - --port=30333
       - --ws-port=9944
@@ -73,7 +73,7 @@ services:
       - ./chainspec:/chainspec
       - validator_charlie:/data
     command:
-      - --chain=/chainspec/rococo-4.json
+      - --chain=/chainspec/rococo-3.json
       - --base-path=/data/tmp/charlie_data
       - --port=30333
       - --ws-port=9944
@@ -90,34 +90,6 @@ services:
         ipv4_address: 172.28.1.4
         aliases:
           - charlie
-
-  validator-dave:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
-    ports:
-      - '30339:30333'
-      - '9922:9944'
-      - '9911:9933'
-    volumes:
-      - ./chainspec:/chainspec
-      - validator_charlie:/data
-    command:
-      - --chain=/chainspec/rococo-4.json
-      - --base-path=/data/tmp/dave_data
-      - --port=30333
-      - --ws-port=9944
-      - --rpc-port=9933
-      - --rpc-cors=all
-      - --unsafe-rpc-external
-      - --unsafe-ws-external
-      - --validator
-      - --dave
-      - --no-prometheus
-      - --no-telemetry
-    networks:
-      dex_net:
-        ipv4_address: 172.28.1.6
-        aliases:
-          - dave
 
   dex-genesis-state:
     image: subdarkdex/subdex-collator:v0.2.0
@@ -157,7 +129,6 @@ services:
       - validator-alice
       - validator-bob
       - validator-charlie
-      - validator-dave
     command: >
       /usr/local/bin/start_dex_collator.sh
     networks:
@@ -186,7 +157,6 @@ services:
       - validator-alice
       - validator-bob
       - validator-charlie
-      - validator-dave
     command: >
       /usr/local/bin/start_generic_collator.sh
     networks:
@@ -232,7 +202,6 @@ volumes:
   validator_alice:
   validator_bob:
   validator_charlie:
-  validator_dave:
 
 networks:
   dex_net:

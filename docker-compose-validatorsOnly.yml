@@ -10,7 +10,7 @@ services:
       - ./chainspec:/chainspec
       - validator_alice:/data
     command:
-      - --chain=/chainspec/rococo-4.json
+      - --chain=/chainspec/rococo-3.json
       - --base-path=/data/tmp/validator_alice_data
       - --port=30333
       - --ws-port=6644
@@ -33,7 +33,7 @@ services:
       - ./chainspec:/chainspec
       - validator_bob:/data
     command:
-      - --chain=/chainspec/rococo-4.json
+      - --chain=/chainspec/rococo-3.json
       - --base-path=/data/tmp/validator_bob_data
       - --port=30335
       - --ws-port=9922
@@ -56,7 +56,7 @@ services:
       - ./chainspec:/chainspec
       - validator_charlie:/data
     command:
-      - --chain=/chainspec/rococo-4.json
+      - --chain=/chainspec/rococo-3.json
       - --base-path=/data/tmp/validator_charlie_data
       - --port=30336
       - --ws-port=8822
@@ -69,32 +69,8 @@ services:
       - --no-prometheus
       - --no-telemetry
 
-  validator-dave:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
-    ports:
-      - '30337:30337'
-      - '8844:8844'
-      - '8833:8833'
-    volumes:
-      - ./chainspec:/chainspec
-      - validator_dave:/data
-    command:
-      - --chain=/chainspec/rococo-4.json
-      - --base-path=/data/tmp/validator_dave_data
-      - --port=30337
-      - --ws-port=8844
-      - --rpc-port=8833
-      - --rpc-cors=all
-      - --unsafe-rpc-external
-      - --unsafe-ws-external
-      - --validator
-      - --dave
-      - --no-prometheus
-      - --no-telemetry
-
 volumes: 
   validator_alice:
   validator_bob:
   validator_charlie:
-  validator_dave:
 
