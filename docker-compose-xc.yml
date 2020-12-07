@@ -2,15 +2,24 @@ version: '3'
 services:
   validator-alice:
     image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
+    labels: 
+      - traefik.enable=true
+      - traefik.http.routers.validatorAlice.rule=Host(`subdex.link`) && Path(`/relay`) 
+      - traefik.http.routers.validatorAlice.tls=true
+      - traefik.http.routers.validatorAlice.tls.certresolver=letsEncrypt
+      - traefik.http.routers.validatorAlice.service=validatorAlice
+      - traefik.http.services.validatorAlice.loadbalancer.server.port=9944
+
     ports:
       - '30333:30333'
       - '6644:9944'
       - '9933:9933'
     volumes:
-      - ./:/data
+      - ./chainspec:/chainspec
+      - validator_alice:/data
     command:
-      - --chain=/data/dex_raw.json
-      - --base-path=/data/alice_data
+      - --chain=/chainspec/rococo-3.json
+      - --base-path=/data/tmp/alice_data
       - --port=30333
       - --ws-port=9944
       - --rpc-port=9933
@@ -34,10 +43,11 @@ services:
       - '9966:9944'
       - '9955:9933'
     volumes:
-      - ./:/data
+      - ./chainspec:/chainspec
+      - validator_bob:/data
     command:
-      - --chain=/data/dex_raw.json
-      - --base-path=/data/bob_data
+      - --chain=/chainspec/rococo-3.json
+      - --base-path=/data/tmp/bob_data
       - --port=30333
       - --ws-port=9944
       - --rpc-port=9933
@@ -61,10 +71,11 @@ services:
       - '9988:9944'
       - '9977:9933'
     volumes:
-      - ./:/data
+      - ./chainspec:/chainspec
+      - validator_charlie:/data
     command:
-      - --chain=/data/dex_raw.json
-      - --base-path=/data/charlie_data
+      - --chain=/chainspec/rococo-3.json
+      - --base-path=/data/tmp/charlie_data
       - --port=30333
       - --ws-port=9944
       - --rpc-port=9933
@@ -81,40 +92,14 @@ services:
         aliases:
           - charlie
 
-  validator-dave:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
-    ports:
-      - '30339:30333'
-      - '9922:9944'
-      - '9911:9933'
-    volumes:
-      - ./:/data
-    command:
-      - --chain=/data/dex_raw.json
-      - --base-path=/data/dave_data
-      - --port=30333
-      - --ws-port=9944
-      - --rpc-port=9933
-      - --rpc-cors=all
-      - --unsafe-rpc-external
-      - --unsafe-ws-external
-      - --validator
-      - --dave
-      - --no-prometheus
-      - --no-telemetry
-    networks:
-      dex_net:
-        ipv4_address: 172.28.1.6
-        aliases:
-          - dave
-
   dex-genesis-state:
     image: subdarkdex/subdex-collator:v0.2.0
     volumes:
-      - subdex-genesis-state:/subdex
+       - subdex-genesis-state:/subdex
     command: >
-      /usr/local/bin/subdex-parachain-collator
-      export-genesis-state
+      /usr/local/bin/parachain-collator
+      export-genesis-state --parachain-id=200 
+
       /subdex/subdex-genesis-state
 
   generic-genesis-state:
@@ -122,23 +107,31 @@ services:
     volumes:
       - generic-genesis-state:/generic
     command: >
-      /usr/local/bin/generic-parachain-collator
-      export-genesis-state
+      /usr/local/bin/parachain-collator
+      export-genesis-state --parachain-id=100
       /generic/generic-genesis-state
     
   dex-collator:
+    labels: 
+      - traefik.enable=true
+      - traefik.http.routers.dex.rule=Host(`subdex.link`)
+      - traefik.http.routers.dex.tls=true
+      - traefik.http.routers.dex.tls.certresolver=letsEncrypt
+      - traefik.http.routers.dex.service=dex
+      - traefik.http.services.dex.loadbalancer.server.port=9944
+
     image: subdarkdex/subdex-collator:v0.2.0
     ports:
       - '40440:30333'
       - '9944:9944'
       - '6633:9933'
     volumes:
-      - ./:/subdex
+      - ./chainspec:/chainspec
+      - dex-collator:/data
     depends_on:
       - validator-alice
       - validator-bob
       - validator-charlie
-      - validator-dave
     command: >
       /usr/local/bin/start_dex_collator.sh
     networks:
@@ -148,18 +141,25 @@ services:
           - dex-collator
 
   generic-collator:
+    labels: 
+      - traefik.enable=true
+      - traefik.http.routers.generic.rule=Host(`subdex.link`) && Path(`/generic`)
+      - traefik.http.routers.generic.tls=true
+      - traefik.http.routers.generic.tls.certresolver=letsEncrypt
+      - traefik.http.routers.generic.service=generic
+      - traefik.http.services.generic.loadbalancer.server.port=9944
     image: subdarkdex/generic-collator:v0.2.0
     ports:
       - '40444:30333'
       - '7744:9944'
       - '7733:9933'
     volumes:
-      - ./:/data
+      - ./chainspec:/chainspec
+      - generic-collator:/data
     depends_on:
       - validator-alice
       - validator-bob
       - validator-charlie
-      - validator-dave
     command: >
       /usr/local/bin/start_generic_collator.sh
     networks:
@@ -171,7 +171,7 @@ services:
   dex-runtime:
     image: subdarkdex/subdex-runtime:v0.2.0
     volumes:
-      - subdex-chain-wasm-runtime:/runtime
+       - subdex-chain-wasm-runtime:/runtime
 
   generic-runtime:
     image: subdarkdex/generic-runtime:v0.2.0
@@ -200,6 +200,11 @@ volumes:
   subdex-chain-wasm-runtime:
   generic-genesis-state:
   generic-chain-wasm-runtime:
+  dex-collator:
+  generic-collator:
+  validator_alice:
+  validator_bob:
+  validator_charlie:
 
 networks:
   dex_net:

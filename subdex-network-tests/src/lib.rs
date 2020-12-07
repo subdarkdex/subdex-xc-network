@@ -314,8 +314,8 @@ mod test {
         let bob_account = AccountKeyring::Bob.to_account_id();
         let bob_pair = PairSigner::<NodeTemplateRuntime, _>::new(AccountKeyring::Bob.pair());
 
-        let asset_issue_amount = 50_000_000_000_000u128;
-        let transfer_amount = 1_000_000_000_000u128;
+        let asset_issue_amount = 50_000_000_000_000_000u128;
+        let transfer_amount = 40_000_000_000_000_000u128;
 
         let generic_client = ClientBuilder::<NodeTemplateRuntime>::new()
             .set_url(GENERIC_CHAIN_WS)

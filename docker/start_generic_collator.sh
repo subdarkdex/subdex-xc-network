@@ -8,7 +8,8 @@
 
 set -e
 
-dc="/usr/local/bin/generic-parachain-collator"
+dc="/usr/local/bin/parachain-collator"
+
 
 if [ ! -x "$dc" ]; then
     echo "FATAL: no correct executables"
@@ -17,8 +18,8 @@ fi
 
 dc_args=( "$@" )
 
-charlie_ip="172.28.1.4"
-dave_ip="172.28.1.6"
+alice_ip="172.28.1.1"
+bob_ip="172.28.1.2"
 
 get_id () {
     ip="$1"
@@ -42,7 +43,8 @@ bootnode () {
 
 
 
-dc_args+=("--base-path=/generic/generic_data" 
+dc_args+=("--base-path=/generic/tmp/generic_data" 
+
     "--parachain-id=100" 
     "--validator"
     "--port=30333"
@@ -53,9 +55,10 @@ dc_args+=("--base-path=/generic/generic_data"
     "--rpc-cors=all" 
     "--out-peers=0" 
     "--in-peers=0" 
-    "--" "--chain=/generic/rococo-4.json" 
-    "--bootnodes=$(bootnode "$charlie_ip")" 
-    "--bootnodes=$(bootnode "$dave_ip")" 
+    "--" "--chain=/chainspec/rococo-3.json" 
+    "--bootnodes=$(bootnode "$alice_ip")" 
+    "--bootnodes=$(bootnode "$bob_ip")" 
+
     "--ws-port=6622" 
     "--rpc-port=6611" 
     "--port=40330"

@@ -1,0 +1,25 @@
+entryPoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: :443
+
+certificatesResolvers:
+  letsEncrypt:
+    acme:
+      email: byHogwarsExpress@protonmail.com 
+      storage: /acme.json
+      tlsChallenge: {}
+      httpChallenge:
+        entryPoint: web 
+
+
+providers:
+  docker:
+    endpoint: unix:///var/run/docker.sock
+    exposedByDefault: false

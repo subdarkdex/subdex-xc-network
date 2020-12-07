@@ -41,7 +41,8 @@ bootnode () {
 }
 
 
-dc_args+=("--base-path=/subdex/dex_data" 
+
+dc_args+=("--base-path=/subdex/tmp/dex_data" 
     "--parachain-id=200" 
     "--validator"
     "--port=30333"
@@ -52,7 +53,7 @@ dc_args+=("--base-path=/subdex/dex_data"
     "--rpc-cors=all" 
     "--out-peers=0" 
     "--in-peers=0" 
-    "--" "--chain=/subdex/rococo-4.json" 
+    "--" "--chain=/chainspec/rococo-3.json" 
     "--bootnodes=$(bootnode "$alice_ip")" 
     "--bootnodes=$(bootnode "$bob_ip")" 
     "--ws-port=6622" 
