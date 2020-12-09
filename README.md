@@ -170,10 +170,11 @@ This will set up 2 repositories parallel to this one if they are not already set
 ```
 
 ## Interacting with local testnet
+- PolkadotJS App - localhost:8080
 - Subdex Parachain - localhost:9944
 - Relay Chain - localhost:6644
 - Generic Parachain - localhost:7744
-
+- subdex-ui - you can use https://subdex.network or run [subdex-ui](https://github.com/subdarkdex/subdex-ui)
 ___
 
 ## Building all docker images for dockerhub
