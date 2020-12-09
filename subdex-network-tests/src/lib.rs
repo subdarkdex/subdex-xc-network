@@ -313,6 +313,7 @@ mod test {
     async fn transfer_tokens_between_generic_and_dex_chain() {
         let bob_account = AccountKeyring::Bob.to_account_id();
         let bob_pair = PairSigner::<NodeTemplateRuntime, _>::new(AccountKeyring::Bob.pair());
+        let bob_relay_pair = PairSigner::<KusamaRuntime, _>::new(AccountKeyring::Bob.pair());
 
         let asset_issue_amount = 50_000_000_000_000_000u128;
         let transfer_amount = 40_000_000_000_000_000u128;
@@ -329,6 +330,26 @@ mod test {
             .await
             .unwrap();
 
+        // pre-seed
+        let relay_client = ClientBuilder::<KusamaRuntime>::new()
+            .set_url(RELAY_ALICE_WS)
+            .build()
+            .await
+            .unwrap();
+
+        let relay_transfer_asset = relay_client
+            .watch(
+                parachains::TransferToParachainCall::<KusamaRuntime> {
+                    to: SUBDEX_PARA_ID,
+                    amount: transfer_amount,
+                    remark: encoded_to_remark(vec![0; 32]),
+                },
+                &bob_relay_pair,
+            )
+            .await;
+
+        assert! {relay_transfer_asset.is_ok()};
+        println! {"Transfer Asset from Relay is OK"};
         println!("----- Running transfer currency and tokens from Generic to Dex chain -----");
 
         // Initialise so we have some generic assets

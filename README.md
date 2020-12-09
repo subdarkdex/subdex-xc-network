@@ -19,30 +19,61 @@ You can checkout the [blog post](https://medium.com/@subdex/subdex-milestone-1-d
 ____
 ## Interaction
 The subdex testnet can be interacted with through 
-- Subdex Parachain - wss://subdex.link 
+- Subdex Parachain - wss://subdex.link/dex 
 - Relay Chain - wss://subdex.link/relay
 - Generic Parachain - wss://subdex.link/generic
+
+We are also serving a polkadot.js apps web application v0.69.1 on https://subdex.link
 
 ### Subdex User Interface
 - Subdex Parachain - Please visit our dex UI [here](https://subdex.network) to connect to the Subdex Parachain
 
-### Interaction with polkadot.js.org/apps
+### Interaction with subdex.link
 
 #### Types:
-If you are using the polkadot.js.org/apps web application, please make sure you add for the Generic Parachain:
-
+If you are using the subdex.link - A polkadotJs Apps web application, please make sure you add the following types 
 ```
+
 {
-  "AssetId": "u64",
-  "AssetIdOf": "AssetId",
   "Address": "AccountId",
   "LookupSource": "AccountId",
   "RefCount": "u8",
+  "AssetId": "u64",
+  "Shares": "Balance",
+  "ParaChainAssetId": "Option<AssetId>",
+  "DexAssetId": "AssetIdOf<T>",
+  "AssetIdOf": "AssetId",
+  "TreasuryFee": "Option<Balance>",
+  "ValidationFunction": "Vec<u8>",
+  "ValidationFunctionParams": {
+    "max_code_size": "u32",
+    "relay_chain_height": "RelayChainBlockNumber",
+    "code_upgrade_allowed": "Option<RelayChainBlockNumber>"
+  },
+  "Exchange": {
+    "first_asset_pool": "Balance",
+    "second_asset_pool": "Balance",
+    "invariant": "Balance",
+    "total_shares": "Balance",
+    "last_timestamp": "IMoment",
+    "price1_cumulative_last": "Balance",
+    "price2_cumulative_last": "Balance",
+    "shares": "BTreeMap<AccountId, Balance>"
+  },
+  "IMoment": "u64",
+  "DexTreasury": {
+    "dex_account": "AccountId",
+    "treasury_fee_rate_nominator": "Balance",
+    "treasury_fee_rate_denominator": "Balance"
+  },
+  "Asset": {
+    "_enum": {
+      "MainNetworkCurrency": null,
+      "ParachainAsset": "(AssetId)"
+    }
+  },
 }
 ```
-
-For Subdex Parachain specific types, please see [here](https://github.com/subdarkdex/subdex-ui/blob/master/src/config/common.json#L5)
-
 ## Network Details
 
 ### Accounts

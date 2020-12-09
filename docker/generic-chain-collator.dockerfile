@@ -17,9 +17,7 @@ RUN apt-get update && \
 		curl && \
 		curl -sSo /wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
 		chmod +x /wait-for-it.sh && \
-
 		curl -sL https://deb.nodesource.com/setup_12.x | bash - \
-
 # apt cleanup
 	apt-get autoremove -y && \
 	apt-get clean && \

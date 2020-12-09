@@ -1,5 +1,21 @@
 version: '3'
 services:
+  apps:
+    image:  jacogr/polkadot-js-apps:0.69.1
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.apps.rule=Host(`subdex.link`)
+      - traefik.http.routers.apps.tls=true
+      - traefik.http.routers.apps.tls.certresolver=letsEncrypt
+      - traefik.http.routers.apps.service=apps
+      - traefik.http.services.apps.loadbalancer.server.port=80
+    environment:
+      - WS_URL=wss://subdex.link/relay
+    ports:
+      - '8080:80'
+    networks:
+      dex_net:
+
   validator-alice:
     image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
     labels: 
@@ -9,7 +25,6 @@ services:
       - traefik.http.routers.validatorAlice.tls.certresolver=letsEncrypt
       - traefik.http.routers.validatorAlice.service=validatorAlice
       - traefik.http.services.validatorAlice.loadbalancer.server.port=9944
-
     ports:
       - '30333:30333'
       - '6644:9944'
@@ -114,7 +129,7 @@ services:
   dex-collator:
     labels: 
       - traefik.enable=true
-      - traefik.http.routers.dex.rule=Host(`subdex.link`)
+      - traefik.http.routers.dex.rule=Host(`subdex.link`) && Path (`/dex`)
       - traefik.http.routers.dex.tls=true
       - traefik.http.routers.dex.tls.certresolver=letsEncrypt
       - traefik.http.routers.dex.service=dex
