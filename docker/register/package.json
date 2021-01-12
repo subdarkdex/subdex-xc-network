@@ -7,6 +7,6 @@
   "license": "Unlicensed",
   "private": true,
   "dependencies": {
-    "@polkadot/api": "^2.0.1"
+    "@polkadot/api": "^3.3.0"
   }
 }

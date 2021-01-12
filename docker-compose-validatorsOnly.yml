@@ -1,7 +1,7 @@
 version: '3'
 services:
   validator-alice:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
+    image: parity/polkadot:master
     ports:
       - '30333:30333'
       - '6644:6644'
@@ -10,8 +10,7 @@ services:
       - ./chainspec:/chainspec
       - validator_alice:/data
     command:
-      - --chain=/chainspec/rococo-3.json
-      - --base-path=/data/tmp/validator_alice_data
+      - --chain=/chainspec/rococo_local.json
       - --port=30333
       - --ws-port=6644
       - --rpc-port=9933
@@ -24,7 +23,7 @@ services:
       - --no-telemetry
 
   validator-bob:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
+    image: parity/polkadot:master
     ports:
       - '30335:30335'
       - '9922:9922'
@@ -33,8 +32,7 @@ services:
       - ./chainspec:/chainspec
       - validator_bob:/data
     command:
-      - --chain=/chainspec/rococo-3.json
-      - --base-path=/data/tmp/validator_bob_data
+      - --chain=/chainspec/rococo_local.json
       - --port=30335
       - --ws-port=9922
       - --rpc-port=9911
@@ -47,7 +45,7 @@ services:
       - --no-telemetry
 
   validator-charlie:
-    image: joshyorndorff/cumulus-workshop-polkadot:sha-e142354
+    image: parity/polkadot:master
     ports:
       - '30336:30336'
       - '8822:8822'
@@ -56,8 +54,7 @@ services:
       - ./chainspec:/chainspec
       - validator_charlie:/data
     command:
-      - --chain=/chainspec/rococo-3.json
-      - --base-path=/data/tmp/validator_charlie_data
+      - --chain=/chainspec/rococo_local.json
       - --port=30336
       - --ws-port=8822
       - --rpc-port=8811

@@ -12,15 +12,16 @@ async function main () {
   const genesisState = process.argv[5];
   const paraId = process.argv[6];
   
-  const runtimeFile = fs.readFileSync(path.resolve(__dirname, runtimePath)).toString('hex');
+  const runtimeFile = fs.readFileSync(path.resolve(__dirname, runtimePath)).toString();
   const genesisFile = fs.readFileSync(path.resolve(__dirname, genesisState)).toString();
 
+  //console.log("runtime: ", runtimeFile);
+  console.log("genesisState: ", genesisFile);
   const wsProvider = new WsProvider(`ws://${ip}:${port}`);
 
   const api = await ApiPromise.create({ 
     provider: wsProvider,
     types: { 
-	    "RefCount": "u8",
       "Address": "AccountId", 
       "LookupSource": "AccountId",
     }
@@ -30,18 +31,18 @@ async function main () {
   const alice = keyring.addFromUri('//Alice');
 
   api.tx.sudo
-    .sudo(api.tx.registrar
-      .registerPara(
+    .sudo(api.tx.parasSudoWrapper
+      .sudoScheduleParaInitialize(
         paraId,
-        {"scheduling":"Always"},
-        '0x'+runtimeFile,
-        genesisFile
+        {
+		"genesisHead": genesisFile, 
+		"validationCode": runtimeFile,
+		"parachain": true
+	},
       )
     )
-    .signAndSend(alice, ({ events = [], status }) => {
-      console.log('Transaction status:', status.type);
-
-      if (status.isInBlock) {
+    .signAndSend(alice, ({ status, events }) => {
+	    if (status.isInBlock) {
         console.log('Included at block hash', status.asInBlock.toHex());
         console.log('Events:');
 
@@ -55,5 +56,6 @@ async function main () {
       }
     });
 }
+
 
 main().catch(console.error)
