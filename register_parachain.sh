@@ -2,8 +2,8 @@
 
 set -e
 
-../../cumulus/target/release/rococo-collator export-genesis-state --parachain-id=100 tmp/rc_gs
-../../cumulus/target/release/rococo-collator export-genesis-wasm tmp/rc_wasm
+../../cumulus/target/debug/rococo-collator export-genesis-state --parachain-id=100 tmp/rc_gs
+../../cumulus/target/debug/rococo-collator export-genesis-wasm tmp/rc_wasm
 
 # ../generic-parachain/target/release/parachain-collator export-genesis-state --parachain-id=100 tmp/gc_gs
 # ../subdex-parachain/target/release/parachain-collator export-genesis-state --parachain-id=200 tmp/sc_gs

@@ -114,7 +114,6 @@ services:
     command: >
       /usr/local/bin/parachain-collator
       export-genesis-state --parachain-id=200 
-
       /subdex/subdex-genesis-state
 
   generic-genesis-state:

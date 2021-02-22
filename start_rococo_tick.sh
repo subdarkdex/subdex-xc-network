@@ -8,7 +8,7 @@
 
 set -e
 
-gc="../../cumulus/target/release/rococo-collator"
+gc="../../cumulus/target/debug/rococo-collator"
 
 if [ ! -x "$gc" ]; then
     echo "FATAL: no correct executables"
